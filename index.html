@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Melcher Bachelor Trip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d2024;--surface:#142d33;--raised:#1b3b43;--line:#27535c;
+    --text:#eaf3f1;--muted:#8caaa9;--water:#56bccb;--sun:#e8a14e;--green:#6fc792;--rose:#e0788a;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;line-height:1.5;padding:0 0 60px;}
+  .wrap{max-width:640px;margin:0 auto;padding:0 16px;}
+  header{padding:28px 16px 20px;text-align:center;background:radial-gradient(120% 80% at 50% -10%, rgba(86,188,203,.18), transparent 60%),linear-gradient(180deg,#0f262b,#0d2024);border-bottom:1px solid var(--line);}
+  .eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--water);font-weight:600;}
+  h1{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:34px;line-height:1.05;margin:8px 0 6px;letter-spacing:-.01em;}
+  .when{color:var(--muted);font-size:14px;}
+  .when b{color:var(--text);font-weight:600;}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0;}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 10px;text-align:center;}
+  .stat .num{font-family:'Fraunces',serif;font-size:30px;font-weight:600;line-height:1;}
+  .stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:6px;}
+  .stat.warn .num{color:var(--sun);}
+  .stat.good .num{color:var(--green);}
+  .stat.bad .num{color:var(--rose);}
+  .sec{margin:30px 0 8px;}
+  .sec h2{font-family:'Fraunces',serif;font-size:20px;font-weight:600;margin:0 0 14px;}
+  .btn{appearance:none;border:none;cursor:pointer;font-family:inherit;font-weight:600;border-radius:10px;padding:11px 14px;font-size:14px;width:100%;background:var(--sun);color:#3a2408;transition:transform .1s;}
+  .btn:active{transform:scale(.98);}
+  .btn.ghost{background:var(--raised);color:var(--text);border:1px solid var(--line);}
+  .btn.water{background:var(--water);color:#04282d;}
+  .btn.sm{width:auto;padding:9px 14px;font-size:13px;}
+  .people{display:flex;flex-direction:column;gap:10px;}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;transition:opacity .15s;}
+  .card.declined{opacity:.48;}
+  .card .top{display:flex;align-items:center;gap:11px;}
+  .avatar{width:38px;height:38px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:700;font-size:14px;color:#04282d;background:var(--water);}
+  .card.declined .avatar{background:var(--muted);}
+  .card .nm{font-weight:600;font-size:16px;}
+  .card .role{font-size:12px;color:var(--muted);}
+  .pill{margin-left:auto;font-size:11px;font-weight:600;padding:5px 11px;border-radius:999px;white-space:nowrap;cursor:pointer;border:1px solid transparent;user-select:none;}
+  .pill.rsvp-yes{background:rgba(111,199,146,.16);color:var(--green);border-color:rgba(111,199,146,.3);}
+  .pill.rsvp-no{background:rgba(224,120,138,.16);color:var(--rose);border-color:rgba(224,120,138,.32);}
+  .pill.rsvp-pending{background:rgba(140,170,169,.16);color:var(--muted);border-color:rgba(140,170,169,.3);}
+  .note{font-size:13px;color:#bcd2d0;margin:11px 0 0;padding-top:11px;border-top:1px solid var(--line);}
+  .note .ntext{cursor:pointer;}
+  .note .ntext:after{content:" \270E";color:var(--muted);font-size:11px;}
+  .note textarea{width:100%;min-height:64px;background:var(--raised);color:var(--text);border:1px solid var(--water);border-radius:9px;padding:8px;font-family:inherit;font-size:13px;}
+  .travelchip{font-size:11px;font-weight:600;padding:4px 10px;border-radius:999px;cursor:pointer;border:1px solid var(--line);background:var(--raised);color:var(--muted);display:inline-block;margin-top:9px;user-select:none;}
+  .travelchip.waiting{color:var(--sun);border-color:rgba(232,161,78,.3);}
+  .travelchip.responded{color:var(--water);border-color:rgba(86,188,203,.3);}
+  .travelchip.set{color:var(--green);border-color:rgba(111,199,146,.3);}
+  .ride-tag{font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;margin-left:8px;display:inline-block;}
+  .ride-tag.needs{background:rgba(224,120,138,.16);color:var(--rose);}
+  .ride-tag.driver{background:rgba(111,199,146,.14);color:var(--green);}
+  .assign{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:11px;}
+  .assign .full{grid-column:1/-1;}
+  .field label{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:4px;}
+  select,input[type=text],input[type=number]{width:100%;appearance:none;background:var(--raised);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:9px 10px;font-family:inherit;font-size:13.5px;}
+  select{padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238caaa9' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+  .plan{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+  .plan .grouphead{padding:11px 14px;font-family:'Fraunces',serif;font-weight:600;font-size:15px;background:var(--raised);border-bottom:1px solid var(--line);}
+  .ride-row{padding:14px;border-bottom:1px solid var(--line);}
+  .ride-row:last-child{border-bottom:none;}
+  .ride-row .rh{display:flex;align-items:center;gap:9px;font-weight:600;margin-bottom:5px;flex-wrap:wrap;}
+  .ride-row .rh .tag{font-size:11px;font-weight:600;color:var(--muted);background:var(--raised);padding:2px 8px;border-radius:999px;}
+  .ride-row .rb{font-size:13px;color:#bcd2d0;}
+  .ride-row .rb b{color:var(--text);}
+  .flag{color:var(--sun);font-size:12.5px;margin-top:6px;display:flex;gap:6px;align-items:flex-start;}
+  .rooms{display:flex;flex-direction:column;gap:10px;}
+  .room{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px;}
+  .room .rtop{display:flex;align-items:center;gap:8px;margin-bottom:9px;}
+  .room input.rname{background:transparent;border:none;color:var(--text);font-family:'Fraunces',serif;font-size:17px;font-weight:600;flex:1;min-width:0;padding:2px 0;border-bottom:1px solid transparent;}
+  .room input.rname:focus{outline:none;border-bottom:1px solid var(--water);}
+  .cap{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;}
+  .cap button{width:24px;height:24px;border-radius:7px;border:1px solid var(--line);background:var(--raised);color:var(--text);font-size:14px;cursor:pointer;}
+  .cap.over{color:var(--rose);}
+  .occupants{display:flex;flex-wrap:wrap;gap:6px;min-height:8px;}
+  .occ{background:var(--raised);border:1px solid var(--line);font-size:12.5px;padding:5px 9px;border-radius:999px;display:flex;align-items:center;gap:6px;}
+  .occ button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1;padding:0;}
+  .unassigned{margin-top:6px;font-size:12.5px;color:var(--muted);}
+  .addroom{margin-top:10px;}
+  .day{margin-bottom:14px;}
+  .dayhead{font-family:'Fraunces',serif;font-weight:600;font-size:16px;margin:0 0 8px;color:var(--water);}
+  .acts{display:flex;flex-direction:column;gap:8px;}
+  .act{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;}
+  .act .ah{display:flex;align-items:center;gap:8px;}
+  .act .atime{font-size:11px;font-weight:600;color:var(--muted);background:var(--raised);padding:2px 8px;border-radius:999px;flex:none;}
+  .act .atitle{font-weight:600;font-size:14.5px;flex:1;min-width:0;}
+  .act .adel{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0 2px;}
+  .act .who{margin-top:9px;}
+  .addform{background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+  .addform .full{grid-column:1/-1;}
+  .list{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+  .li{display:flex;align-items:center;gap:11px;padding:12px 14px;border-bottom:1px solid var(--line);}
+  .li:last-child{border-bottom:none;}
+  .li input[type=checkbox]{width:20px;height:20px;accent-color:var(--water);flex:none;}
+  .li .txt{flex:1;font-size:14.5px;min-width:0;overflow-wrap:anywhere;}
+  .li.done .txt{color:var(--muted);text-decoration:line-through;}
+  .li .del{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0 2px;}
+  .addrow{display:flex;gap:8px;margin-top:10px;}
+  .addrow input{flex:1;}
+  .addrow button{flex:none;}
+  .counthint{margin:0 0 10px;color:var(--muted);font-size:13px;}
+  .costform{display:grid;grid-template-columns:1fr;gap:8px;background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:12px;margin-bottom:12px;}
+  .costform .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .exp{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);}
+  .exp:last-child{border-bottom:none;}
+  .exp .edesc{flex:1;min-width:0;}
+  .exp .edesc .d1{font-size:14px;font-weight:600;}
+  .exp .edesc .d2{font-size:12px;color:var(--muted);}
+  .exp .eamt{font-weight:600;font-family:'Fraunces',serif;font-size:16px;}
+  .exp .del{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0 2px;}
+  .summary{background:linear-gradient(180deg,rgba(86,188,203,.1),rgba(86,188,203,.02));border:1px solid rgba(86,188,203,.3);border-radius:16px;padding:16px;margin-top:12px;}
+  .summary .big{font-family:'Fraunces',serif;font-size:24px;font-weight:600;}
+  .summary .per{color:var(--muted);font-size:13px;margin-bottom:10px;}
+  .balrow{display:flex;justify-content:space-between;font-size:13.5px;padding:5px 0;border-top:1px solid var(--line);}
+  .balrow .pos{color:var(--green);font-weight:600;}
+  .balrow .neg{color:var(--rose);font-weight:600;}
+  .settle{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);}
+  .settle .sh{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px;font-weight:600;}
+  .settle .sline{font-size:13.5px;padding:3px 0;}
+  .settle .sline b{color:var(--water);}
+  .foot{margin-top:30px;text-align:center;color:var(--muted);font-size:12px;}
+  .foot button{background:none;border:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-family:inherit;font-size:12px;}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--green);color:#06281a;font-weight:600;font-size:14px;padding:11px 18px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;z-index:50;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  #saveStatus{color:var(--muted);font-size:13px;margin:0 0 12px;}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Lake Cherokee Bachelor Trip</div>
+  <h1>Celebrating Matt</h1>
+  <div class="when"><b>Fri Jul 17</b> to <b>Sun Jul 19, 2026</b></div>
+</header>
+
+<div class="wrap">
+  <div class="stats">
+    <div class="stat good"><div class="num" id="s-coming">7</div><div class="lbl">Coming</div></div>
+    <div class="stat warn"><div class="num" id="s-pending">2</div><div class="lbl">Pending</div></div>
+    <div class="stat bad"><div class="num" id="s-declined">2</div><div class="lbl">Not coming</div></div>
+  </div>
+
+  <div class="sec" id="sec-roster">
+    <h2>Roster</h2>
+    <div class="people" id="people"></div>
+  </div>
+
+  <div class="sec" id="sec-cars">
+    <h2>Cars</h2>
+    <div class="plan" id="plan"></div>
+  </div>
+
+  <div class="sec" id="sec-sched">
+    <h2>Weekend schedule</h2>
+    <div id="schedule"></div>
+    <div class="addform">
+      <div class="field"><label>Day</label>
+        <select id="na-day"><option value="thu">Thu 7/16</option><option value="fri" selected>Fri 7/17</option><option value="sat">Sat 7/18</option><option value="sun">Sun 7/19</option></select>
+      </div>
+      <div class="field"><label>Time</label><input type="text" id="na-time" placeholder="3:00 PM"></div>
+      <div class="field full"><label>Activity</label><input type="text" id="na-title" placeholder="Fishing off the dock"></div>
+      <div class="full"><button class="btn ghost" id="na-add">Add activity</button></div>
+    </div>
+  </div>
+
+  <div class="sec" id="sec-beds">
+    <h2>Beds</h2>
+    <div class="rooms" id="rooms"></div>
+    <div class="unassigned" id="unassigned"></div>
+    <button class="btn ghost addroom" id="addRoom">Add a room</button>
+  </div>
+
+  <div class="sec" id="sec-pack">
+    <h2>Packing list</h2>
+    <p class="counthint" id="packcount"></p>
+    <div class="list" id="packlist"></div>
+    <div class="addrow"><input type="text" id="packnew" placeholder="Add an item"><button class="btn sm ghost" id="packadd">Add</button></div>
+  </div>
+
+  <div class="sec" id="sec-groc">
+    <h2>Grocery run</h2>
+    <p class="counthint" id="groccount"></p>
+    <div class="list" id="groclist"></div>
+    <div class="addrow"><input type="text" id="grocnew" placeholder="Add an item"><button class="btn sm ghost" id="grocadd">Add</button></div>
+  </div>
+
+  <div class="sec" id="sec-cost">
+    <h2>Cost splitter</h2>
+    <div class="costform">
+      <div class="field"><label>What was it</label><input type="text" id="c-desc" placeholder="Groceries, gas, golf"></div>
+      <div class="row2">
+        <div class="field"><label>Amount</label><input type="number" id="c-amt" placeholder="120.00" inputmode="decimal" step="0.01" min="0"></div>
+        <div class="field"><label>Paid by</label><select id="c-by"></select></div>
+      </div>
+      <button class="btn water" id="c-add">Add expense</button>
+    </div>
+    <div class="list" id="explist"></div>
+    <div class="summary" id="costsummary"></div>
+  </div>
+
+  <div class="sec" id="sec-backup">
+    <h2>Backup</h2>
+    <p id="saveStatus"></p>
+    <div style="display:flex;flex-direction:column;gap:9px;">
+      <button class="btn water" id="copyBackup">Copy backup code</button>
+      <button class="btn ghost" id="showRestore">Restore from a backup code</button>
+      <div id="restoreBox" style="display:none;">
+        <textarea id="restoreInput" placeholder="Paste your backup code here" style="width:100%;min-height:90px;background:var(--raised);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;font-family:inherit;font-size:13px;margin-top:2px;"></textarea>
+        <button class="btn" id="doRestore" style="margin-top:8px;">Restore</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot"><button id="reset">Reset to the original plan</button></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+const mem = {};
+let storageOK = false;
+const store = {
+  async get(k){
+    try{ if(window.storage){ const r = await window.storage.get(k, false); return r ? r.value : null; } }catch(e){}
+    return (k in mem) ? mem[k] : null;
+  },
+  async set(k,v){
+    try{ if(window.storage){ await window.storage.set(k, v, false); return true; } }catch(e){}
+    mem[k]=v; return false;
+  }
+};
+async function checkStorage(){
+  try{
+    if(!window.storage) return false;
+    await window.storage.set('mbt_probe','ok',false);
+    const r = await window.storage.get('mbt_probe',false);
+    return !!(r && r.value==='ok');
+  }catch(e){ return false; }
+}
+function encodeState(){ return btoa(unescape(encodeURIComponent(JSON.stringify({people,rooms,pack,groc,costs,acts})))); }
+function updateSaveStatus(){
+  const el=$('#saveStatus'); if(!el) return;
+  if(storageOK){ el.innerHTML='Auto-save is on.'; el.style.color='var(--green)'; }
+  else{ el.innerHTML='Auto-save is off in this view. After making changes, tap <b>Copy backup code</b>, then <b>Restore</b> next time.'; el.style.color='var(--sun)'; }
+}
+
+const DEFAULT_PEOPLE = [
+  {id:'matt',     name:'Matt Melcher',      role:'Groom',      status:'set',       rsvp:'yes',     ride:'rider',  carDown:'carson', carBack:'carson', note:'Going down Thursday night with you.'},
+  {id:'carson',   name:'Carson Yeager',     role:'Host (You)', status:'set',       rsvp:'yes',     ride:'driver', carDown:'carson', carBack:'carson', note:'Going down Thursday night. Has room in the car.'},
+  {id:'collin',   name:'Collin Margiotta',  role:'Groomsman',  status:'responded', rsvp:'yes',     ride:'driver', carDown:'collin', carBack:'collin', note:'Driving down Friday morning, coming through Dallas. Leaving after church Sunday. Happy to give rides.'},
+  {id:'blake',    name:'Blake Debnam',      role:'Groomsman',  status:'responded', rsvp:'yes',     ride:'driver', carDown:'blake',  carBack:'blake',  note:'Driving down Friday afternoon, back Sunday. Happy to give rides.'},
+  {id:'austin',   name:'Austin Bowyer',     role:'Groomsman',  status:'responded', rsvp:'yes',     ride:'own',    carDown:'austin', carBack:'austin', note:'Driving Friday afternoon, back Saturday night (triathlon Sunday morning).'},
+  {id:'nick',     name:'Nick Fontella',     role:'Groomsman',  status:'responded', rsvp:'yes',     ride:'needs',  carDown:'blake',  carBack:'collin', note:'Flying. Lands DFW 12:20pm Friday. Return flight 4:04pm Sunday from DFW. Needs a ride both ways.'},
+  {id:'travis',   name:'Travis Roberts',    role:'Groomsman',  status:'responded', rsvp:'yes',     ride:'needs',  carDown:'carson', carBack:'carson', note:'Flexible on arrival and departure. Wants to ride with you if you have room.'},
+  {id:'kyleE',    name:'Kyle Eberlein',     role:'Groomsman',  status:'waiting',   rsvp:'no',      ride:'unknown',carDown:'',       carBack:'',       note:'No travel details yet.'},
+  {id:'kyleW',    name:'Kyle Waldrep',      role:'Groomsman',  status:'waiting',   rsvp:'pending', ride:'unknown',carDown:'',       carBack:'',       note:'No travel details yet.'},
+  {id:'christian',name:'Christian Hammond', role:'Groomsman',  status:'waiting',   rsvp:'pending', ride:'unknown',carDown:'',       carBack:'',       note:'No travel details yet.'},
+  {id:'winston',  name:'Winston Margaritis',role:'Groomsman',  status:'waiting',   rsvp:'no',      ride:'unknown',carDown:'',       carBack:'',       note:'No travel details yet.'}
+];
+
+const DEFAULT_ROOMS = [
+  {id:'r1', name:'Master',                              cap:1, people:['carson']},
+  {id:'r5', name:'Brad and Angela Cheves Suite',        cap:1, people:['blake']},
+  {id:'r2', name:'Upstairs Queen 1',                    cap:1, people:['matt']},
+  {id:'r3', name:'Upstairs Queen 2',                    cap:1, people:['collin']},
+  {id:'r4', name:'Dungeon King',                        cap:1, people:['nick']},
+  {id:'r6', name:'Pool Room - Three Twins',             cap:2, people:['austin','travis']},
+  {id:'r7', name:'Air Mattress in Upstairs Queen 1',    cap:1, people:[]}
+];
+
+const DEFAULT_PACK = ['Swimsuit','Towel','Sunscreen','Sunglasses','Hat','Golf clubs','Pickleball paddle','Church clothes','Toiletries','Phone charger'].map((t,i)=>({id:'p'+i,text:t,done:false}));
+
+const DEFAULT_GROC = ['Eggs and bacon','Breakfast taco fixings','Burgers and buns','Brats','Chips and salsa','Fruit','Snacks','Coffee','Water','Drinks','Ice','Condiments','Paper plates and towels','Trash bags'].map((t,i)=>({id:'g'+i,text:t,done:false}));
+
+const DEFAULT_COSTS = [
+  {id:'c1', desc:'Cleaners', amt:200, by:'carson'},
+  {id:'c2', desc:'Boat Gas', amt:200, by:'carson'}
+];
+
+const DEFAULT_ACTS = [
+  {id:'a3', day:'fri', time:'7:00 PM',  title:'Dinner at the house', who:'Everyone'},
+  {id:'a4', day:'sat', time:'9:00 AM',  title:'Boat morning: surf and ski', who:''},
+  {id:'a5', day:'sat', time:'1:00 PM',  title:'Casual 9 holes of golf', who:''},
+  {id:'a6', day:'sat', time:'4:30 PM',  title:'Pickleball', who:''},
+  {id:'a7', day:'sat', time:'7:00 PM',  title:'BBQ dinner', who:'Everyone'},
+  {id:'a8', day:'sun', time:'11:00 AM', title:'Church', who:'Everyone but Austin'}
+];
+
+const DAYS = [
+  {key:'thu', label:'Thursday, Jul 16'},
+  {key:'fri', label:'Friday, Jul 17'},
+  {key:'sat', label:'Saturday, Jul 18'},
+  {key:'sun', label:'Sunday, Jul 19'}
+];
+
+const DRIVERS_DOWN = [
+  {id:'carson', label:'Carson', tag:'Thu night'},
+  {id:'collin', label:'Collin', tag:'Fri morning'},
+  {id:'blake',  label:'Blake',  tag:'Fri afternoon'},
+  {id:'austin', label:'Austin', tag:'Fri afternoon'}
+];
+const DRIVERS_BACK = [
+  {id:'carson', label:'Carson', tag:'Sun after church'},
+  {id:'collin', label:'Collin', tag:'Sun after church, via DFW'},
+  {id:'blake',  label:'Blake',  tag:'Sunday'},
+  {id:'austin', label:'Austin', tag:'Sat night'}
+];
+const CAR_EXTRA = [
+  {id:'own',    label:'Own car', tag:''},
+  {id:'flying', label:'Flying',  tag:''},
+  {id:'',       label:'Not set yet', tag:''}
+];
+const STATUSES = ['waiting','responded','set'];
+const STATUS_LABEL = {waiting:'Travel TBD', responded:'Travel in', set:'Travel set'};
+const RSVPS = ['yes','no','pending'];
+const RSVP_LABEL = {yes:'Coming', no:'Not coming', pending:'Pending'};
+
+let people=[], rooms=[], pack=[], groc=[], costs=[], acts=[];
+
+async function load(){
+  storageOK = await checkStorage();
+  const [p,r,pk,gr,cs,ac] = await Promise.all([
+    store.get('mbt_people'), store.get('mbt_rooms'), store.get('mbt_pack'),
+    store.get('mbt_groc'), store.get('mbt_costs'), store.get('mbt_acts')
+  ]);
+  people = p ? JSON.parse(p) : structuredClone(DEFAULT_PEOPLE);
+  rooms  = r ? JSON.parse(r) : structuredClone(DEFAULT_ROOMS);
+  pack   = pk? JSON.parse(pk): structuredClone(DEFAULT_PACK);
+  groc   = gr? JSON.parse(gr): structuredClone(DEFAULT_GROC);
+  costs  = cs? JSON.parse(cs): structuredClone(DEFAULT_COSTS);
+  acts   = ac? JSON.parse(ac): structuredClone(DEFAULT_ACTS);
+  migrate();
+  renderAll();
+  updateSaveStatus();
+}
+function migrate(){
+  people.forEach(p=>{
+    if(!p.rsvp) p.rsvp='yes';
+    if(p.carDown===undefined) p.carDown = (p.car!==undefined ? p.car : '');
+    if(p.carBack===undefined){
+      p.carBack = p.carDown;
+      if(p.id==='nick' && p.carDown==='blake') p.carBack='collin';
+    }
+  });
+  acts.forEach(a=>{
+    if(a.who===undefined){
+      a.who = (a.people||[]).map(id=>first(nameOf(id))).join(', ');
+      delete a.people;
+    }
+  });
+}
+async function save(){
+  await Promise.all([
+    store.set('mbt_people', JSON.stringify(people)),
+    store.set('mbt_rooms',  JSON.stringify(rooms)),
+    store.set('mbt_pack',   JSON.stringify(pack)),
+    store.set('mbt_groc',   JSON.stringify(groc)),
+    store.set('mbt_costs',  JSON.stringify(costs)),
+    store.set('mbt_acts',   JSON.stringify(acts))
+  ]);
+}
+
+const $ = s => document.querySelector(s);
+function initials(n){ return n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+function first(n){ return n.split(' ')[0]; }
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),1600); }
+function nameOf(pid){ const p=people.find(p=>p.id===pid); return p?p.name:pid; }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function payers(){ return people.filter(p=>p.rsvp==='yes' && p.id!=='matt'); }
+function yesPeople(){ return people.filter(p=>p.rsvp==='yes'); }
+
+function renderAll(){ renderStats(); renderPeople(); renderPlan(); renderSchedule(); renderRooms(); renderPack(); renderGroc(); renderCosts(); }
+
+function renderStats(){
+  $('#s-coming').textContent   = people.filter(p=>p.rsvp==='yes').length;
+  $('#s-pending').textContent  = people.filter(p=>p.rsvp==='pending').length;
+  $('#s-declined').textContent = people.filter(p=>p.rsvp==='no').length;
+}
+
+function renderPeople(){
+  const wrap=$('#people'); wrap.innerHTML='';
+  people.forEach(p=>{
+    const declined = p.rsvp==='no';
+    const card=document.createElement('div');
+    card.className='card'+(declined?' declined':'');
+    let body='';
+    if(declined){
+      body = `<div class="note"><span class="ntext" data-id="${p.id}">${esc(p.note||'Not coming.')}</span></div>`;
+    }else{
+      const rideTag = p.ride==='needs' ? `<span class="ride-tag needs">Needs a ride</span>`
+                    : (p.ride==='driver' ? `<span class="ride-tag driver">Can give rides</span>` : '');
+      body = `
+        <div class="note"><span class="ntext" data-id="${p.id}">${esc(p.note)}</span>${rideTag}
+          <div><span class="travelchip ${p.status}" data-id="${p.id}" data-act="travel">${STATUS_LABEL[p.status]}</span></div>
+        </div>
+        <div class="assign">
+          <div class="field"><label>Ride down</label>
+            <select data-id="${p.id}" data-k="carDown">
+              ${[...DRIVERS_DOWN,...CAR_EXTRA].map(c=>`<option value="${c.id}" ${c.id===p.carDown?'selected':''}>${c.id&&DRIVERS_DOWN.some(d=>d.id===c.id)?'With '+c.label+', '+c.tag:c.label}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field"><label>Ride back</label>
+            <select data-id="${p.id}" data-k="carBack">
+              ${[...DRIVERS_BACK,...CAR_EXTRA].map(c=>`<option value="${c.id}" ${c.id===p.carBack?'selected':''}>${c.id&&DRIVERS_BACK.some(d=>d.id===c.id)?'With '+c.label+', '+c.tag:c.label}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field full"><label>Bed</label>
+            <select data-id="${p.id}" data-k="bed">
+              <option value="">Not set yet</option>
+              ${rooms.map(r=>`<option value="${r.id}" ${roomOf(p.id)===r.id?'selected':''}>${esc(r.name)}</option>`).join('')}
+            </select>
+          </div>
+        </div>`;
+    }
+    card.innerHTML=`
+      <div class="top">
+        <div class="avatar">${initials(p.name)}</div>
+        <div><div class="nm">${esc(p.name)}</div><div class="role">${esc(p.role)}</div></div>
+        <div class="pill rsvp-${p.rsvp}" data-id="${p.id}" data-act="rsvp">${RSVP_LABEL[p.rsvp]}</div>
+      </div>${body}`;
+    wrap.appendChild(card);
+  });
+
+  wrap.querySelectorAll('.pill[data-act="rsvp"]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const p=people.find(x=>x.id===el.dataset.id);
+      p.rsvp = RSVPS[(RSVPS.indexOf(p.rsvp)+1)%RSVPS.length];
+      if(p.rsvp==='no'){
+        rooms.forEach(r=>{ r.people=r.people.filter(x=>x!==p.id); });
+        p.carDown=''; p.carBack='';
+      }
+      save(); renderAll();
+    });
+  });
+  wrap.querySelectorAll('.travelchip[data-act="travel"]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const p=people.find(x=>x.id===el.dataset.id);
+      p.status=STATUSES[(STATUSES.indexOf(p.status)+1)%STATUSES.length];
+      save(); renderPeople();
+    });
+  });
+  wrap.querySelectorAll('.ntext').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const p=people.find(x=>x.id===el.dataset.id);
+      const parent=el.parentElement;
+      const ta=document.createElement('textarea');
+      ta.value=p.note||'';
+      parent.replaceChild(ta,el);
+      ta.focus();
+      ta.addEventListener('blur',()=>{ p.note=ta.value.trim(); save(); renderPeople(); });
+    });
+  });
+  wrap.querySelectorAll('select[data-k="carDown"],select[data-k="carBack"]').forEach(el=>{
+    el.addEventListener('change',()=>{ const p=people.find(x=>x.id===el.dataset.id); p[el.dataset.k]=el.value; save(); renderPlan(); });
+  });
+  wrap.querySelectorAll('select[data-k="bed"]').forEach(el=>{
+    el.addEventListener('change',()=>{ assignBed(el.dataset.id, el.value); });
+  });
+}
+
+function renderPlan(){
+  const rows = (drivers, key) => drivers.map(d=>{
+    const riders = yesPeople().filter(p=>p[key]===d.id && p.id!==d.id).map(p=>p.name);
+    const drv = people.find(p=>p.id===d.id);
+    if(!drv || drv.rsvp!=='yes') return '';
+    let flag='';
+    if(key==='carDown' && d.id==='blake' && riders.includes('Nick Fontella')) flag=`Grab Nick at DFW after his 12:20 pm landing.`;
+    if(key==='carBack' && d.id==='collin' && riders.includes('Nick Fontella')) flag=`Leave the lake by about 1:00 pm so Nick makes his 4:04 pm flight. Church ends at 12, so it works but it is tight.`;
+    if(key==='carBack' && d.id==='austin') flag = riders.length? `Austin leaves Saturday night, so these riders skip Sunday.` : '';
+    return `<div class="ride-row">
+      <div class="rh">${d.label}'s car<span class="tag">${d.tag}</span></div>
+      <div class="rb">${riders.length?`Riders: <b>${riders.map(esc).join(', ')}</b>`:'No riders yet.'}</div>
+      ${flag?`<div class="flag">&#9888;<span>${flag}</span></div>`:''}
+    </div>`;
+  }).join('');
+  $('#plan').innerHTML = `
+    <div class="grouphead">Going down</div>${rows(DRIVERS_DOWN,'carDown')}
+    <div class="grouphead">Coming back</div>${rows(DRIVERS_BACK,'carBack')}`;
+}
+
+function renderSchedule(){
+  const wrap=$('#schedule'); wrap.innerHTML='';
+  DAYS.forEach(d=>{
+    const dayActs = acts.filter(a=>a.day===d.key);
+    if(!dayActs.length) return;
+    const dayEl=document.createElement('div'); dayEl.className='day';
+    dayEl.innerHTML=`<div class="dayhead">${d.label}</div>`;
+    const list=document.createElement('div'); list.className='acts';
+    dayActs.forEach(a=>{
+      const el=document.createElement('div'); el.className='act';
+      el.innerHTML=`
+        <div class="ah">
+          <span class="atime">${esc(a.time)}</span>
+          <span class="atitle">${esc(a.title)}</span>
+          <button class="adel" data-id="${a.id}" aria-label="Delete activity">&times;</button>
+        </div>
+        <div class="who"><input type="text" data-id="${a.id}" value="${esc(a.who||'')}" placeholder="Who / notes"></div>`;
+      list.appendChild(el);
+    });
+    dayEl.appendChild(list);
+    wrap.appendChild(dayEl);
+  });
+  wrap.querySelectorAll('.who input').forEach(inp=>{
+    inp.addEventListener('input',()=>{
+      const a=acts.find(x=>x.id===inp.dataset.id);
+      a.who=inp.value;
+      clearTimeout(inp._t); inp._t=setTimeout(save,400);
+    });
+    inp.addEventListener('blur',save);
+  });
+  wrap.querySelectorAll('.adel').forEach(b=>{
+    b.addEventListener('click',()=>{
+      acts = acts.filter(a=>a.id!==b.dataset.id);
+      save(); renderSchedule();
+    });
+  });
+}
+
+function roomOf(pid){ const r=rooms.find(r=>r.people.includes(pid)); return r?r.id:''; }
+function assignBed(pid, rid){
+  rooms.forEach(r=>{ r.people=r.people.filter(x=>x!==pid); });
+  if(rid){ const r=rooms.find(r=>r.id===rid); if(r) r.people.push(pid); }
+  save(); renderRooms(); renderPeople();
+}
+
+function renderRooms(){
+  const wrap=$('#rooms'); wrap.innerHTML='';
+  rooms.forEach(r=>{
+    const over = r.people.length>r.cap;
+    const el=document.createElement('div'); el.className='room';
+    el.innerHTML=`
+      <div class="rtop">
+        <input class="rname" value="${esc(r.name)}" data-id="${r.id}" aria-label="Room name">
+        <div class="cap ${over?'over':''}">
+          <button data-id="${r.id}" data-d="-1" aria-label="Fewer beds">&minus;</button>
+          <span>${r.people.length}/${r.cap} beds</span>
+          <button data-id="${r.id}" data-d="1" aria-label="More beds">+</button>
+        </div>
+      </div>
+      <div class="occupants">
+        ${r.people.length? r.people.map(pid=>`<span class="occ">${esc(nameOf(pid))}<button data-p="${pid}" aria-label="Remove">&times;</button></span>`).join('') : '<span class="unassigned">Empty</span>'}
+      </div>`;
+    wrap.appendChild(el);
+  });
+  wrap.querySelectorAll('.rname').forEach(inp=>{
+    inp.addEventListener('input',()=>{ const r=rooms.find(r=>r.id===inp.dataset.id); r.name=inp.value; save(); });
+    inp.addEventListener('blur',()=>{ renderPeople(); });
+  });
+  wrap.querySelectorAll('.cap button').forEach(b=>{
+    b.addEventListener('click',()=>{ const r=rooms.find(r=>r.id===b.dataset.id); r.cap=Math.max(1, r.cap + parseInt(b.dataset.d,10)); save(); renderRooms(); });
+  });
+  wrap.querySelectorAll('.occ button').forEach(b=>{
+    b.addEventListener('click',()=>{ assignBed(b.dataset.p, ''); });
+  });
+  const assigned = new Set(rooms.flatMap(r=>r.people));
+  const left = people.filter(p=>p.rsvp==='yes' && !assigned.has(p.id));
+  $('#unassigned').innerHTML = left.length ? `Not in a bed yet: ${left.map(p=>esc(p.name)).join(', ')}` : `Everyone confirmed has a bed.`;
+}
+
+function renderChecklist(items, listSel, countSel, kind){
+  const wrap=$(listSel); wrap.innerHTML='';
+  items.forEach(it=>{
+    const el=document.createElement('div'); el.className='li'+(it.done?' done':'');
+    el.innerHTML=`
+      <input type="checkbox" ${it.done?'checked':''} data-id="${it.id}">
+      <span class="txt">${esc(it.text)}</span>
+      <button class="del" data-id="${it.id}" aria-label="Delete">&times;</button>`;
+    wrap.appendChild(el);
+  });
+  const left = items.filter(i=>!i.done).length;
+  $(countSel).textContent = items.length===0 ? 'Nothing on the list yet.' : (left===0 ? 'All done.' : left+' left to get.');
+  wrap.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change',()=>{
+      const it=items.find(x=>x.id===cb.dataset.id); it.done=cb.checked;
+      save(); kind==='pack'?renderPack():renderGroc();
+    });
+  });
+  wrap.querySelectorAll('.del').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const idx=items.findIndex(x=>x.id===b.dataset.id);
+      if(idx>-1) items.splice(idx,1);
+      save(); kind==='pack'?renderPack():renderGroc();
+    });
+  });
+}
+function renderPack(){ renderChecklist(pack, '#packlist', '#packcount', 'pack'); }
+function renderGroc(){ renderChecklist(groc, '#groclist', '#groccount', 'groc'); }
+
+function addItem(items, inputSel, kind){
+  const inp=$(inputSel); const t=inp.value.trim();
+  if(!t) return;
+  items.push({id:kind+Date.now(), text:t, done:false});
+  inp.value='';
+  save(); kind==='pack'?renderPack():renderGroc();
+}
+
+function renderCosts(){
+  const by=$('#c-by');
+  by.innerHTML = yesPeople().map(p=>`<option value="${p.id}" ${p.id==='carson'?'selected':''}>${esc(first(p.name))}</option>`).join('');
+
+  const wrap=$('#explist'); wrap.innerHTML='';
+  costs.forEach(e=>{
+    const el=document.createElement('div'); el.className='exp';
+    el.innerHTML=`
+      <div class="edesc"><div class="d1">${esc(e.desc)}</div><div class="d2">Paid by ${esc(first(nameOf(e.by)))}</div></div>
+      <div class="eamt">$${e.amt.toFixed(2)}</div>
+      <button class="del" data-id="${e.id}" aria-label="Delete">&times;</button>`;
+    wrap.appendChild(el);
+  });
+  wrap.querySelectorAll('.del').forEach(b=>{
+    b.addEventListener('click',()=>{ costs=costs.filter(c=>c.id!==b.dataset.id); save(); renderCosts(); });
+  });
+
+  const pool = payers();
+  const total = costs.reduce((s,e)=>s+e.amt,0);
+  const share = pool.length ? total/pool.length : 0;
+  const paid = {};
+  costs.forEach(e=>{ paid[e.by]=(paid[e.by]||0)+e.amt; });
+  const ids = new Set([...pool.map(p=>p.id), ...Object.keys(paid)]);
+  const bal = [...ids].map(id=>({id, name:nameOf(id), amt:(paid[id]||0) - (pool.some(p=>p.id===id)?share:0)}));
+
+  let html = `<div class="big">$${total.toFixed(2)} total</div>
+    <div class="per">Split ${pool.length} ways at $${share.toFixed(2)} each: ${pool.map(p=>esc(first(p.name))).join(', ')}. Matt is covered.</div>`;
+  if(costs.length){
+    html += bal.map(b=>`<div class="balrow"><span>${esc(first(b.name))}</span><span class="${b.amt>0.005?'pos':(b.amt<-0.005?'neg':'')}">${b.amt>0.005?'is owed $'+b.amt.toFixed(2):(b.amt<-0.005?'owes $'+(-b.amt).toFixed(2):'even')}</span></div>`).join('');
+    const s = settlements(bal);
+    if(s.length) html += `<div class="settle"><div class="sh">Settle up</div>${s.map(x=>`<div class="sline">${x}</div>`).join('')}</div>`;
+  }
+  $('#costsummary').innerHTML = html;
+}
+function settlements(bal){
+  const cred = bal.filter(b=>b.amt>0.005).map(b=>({...b})).sort((a,b)=>b.amt-a.amt);
+  const deb  = bal.filter(b=>b.amt<-0.005).map(b=>({...b, amt:-b.amt})).sort((a,b)=>b.amt-a.amt);
+  const out=[]; let i=0,j=0;
+  while(i<deb.length && j<cred.length){
+    const pay=Math.min(deb[i].amt, cred[j].amt);
+    out.push(`${esc(first(deb[i].name))} pays <b>${esc(first(cred[j].name))}</b> $${pay.toFixed(2)}`);
+    deb[i].amt-=pay; cred[j].amt-=pay;
+    if(deb[i].amt<0.005) i++;
+    if(cred[j].amt<0.005) j++;
+  }
+  return out;
+}
+
+$('#packadd').addEventListener('click',()=>addItem(pack,'#packnew','pack'));
+$('#packnew').addEventListener('keydown',e=>{ if(e.key==='Enter') addItem(pack,'#packnew','pack'); });
+$('#grocadd').addEventListener('click',()=>addItem(groc,'#grocnew','groc'));
+$('#grocnew').addEventListener('keydown',e=>{ if(e.key==='Enter') addItem(groc,'#grocnew','groc'); });
+
+$('#c-add').addEventListener('click',()=>{
+  const desc=$('#c-desc').value.trim();
+  const amt=parseFloat($('#c-amt').value);
+  const by=$('#c-by').value;
+  if(!desc){ toast('Add a description'); return; }
+  if(!(amt>0)){ toast('Add an amount'); return; }
+  costs.push({id:'c'+Date.now(), desc, amt, by});
+  $('#c-desc').value=''; $('#c-amt').value='';
+  save(); renderCosts(); toast('Expense added');
+});
+
+$('#na-add').addEventListener('click',()=>{
+  const title=$('#na-title').value.trim();
+  const time=$('#na-time').value.trim()||'TBD';
+  const day=$('#na-day').value;
+  if(!title){ toast('Name the activity'); return; }
+  acts.push({id:'a'+Date.now(), day, time, title, who:''});
+  $('#na-title').value=''; $('#na-time').value='';
+  save(); renderSchedule(); toast('Activity added');
+});
+
+$('#addRoom').addEventListener('click',()=>{ rooms.push({id:'r'+Date.now(), name:'New room', cap:2, people:[]}); save(); renderRooms(); renderPeople(); });
+
+async function copyText(txt, okMsg){
+  try{ await navigator.clipboard.writeText(txt); toast(okMsg); }
+  catch(e){ const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); toast(okMsg); }catch(_){ toast('Copy failed'); } ta.remove(); }
+}
+
+$('#copyBackup').addEventListener('click',()=>copyText(encodeState(),'Backup copied'));
+$('#showRestore').addEventListener('click',()=>{ const b=$('#restoreBox'); b.style.display = (b.style.display==='none') ? 'block' : 'none'; });
+$('#doRestore').addEventListener('click',async()=>{
+  const code=$('#restoreInput').value.trim();
+  if(!code){ toast('Paste a code first'); return; }
+  try{
+    const data=JSON.parse(decodeURIComponent(escape(atob(code))));
+    if(data && data.people && data.rooms){
+      people=data.people; rooms=data.rooms;
+      pack = data.pack || pack; groc = data.groc || groc;
+      costs = data.costs || costs; acts = data.acts || acts;
+      migrate();
+      await save(); renderAll();
+      $('#restoreBox').style.display='none'; $('#restoreInput').value='';
+      toast('Restored');
+    }else{ toast('That code did not look right'); }
+  }catch(e){ toast('That code did not look right'); }
+});
+
+$('#reset').addEventListener('click',async()=>{
+  people=structuredClone(DEFAULT_PEOPLE); rooms=structuredClone(DEFAULT_ROOMS);
+  pack=structuredClone(DEFAULT_PACK); groc=structuredClone(DEFAULT_GROC);
+  costs=structuredClone(DEFAULT_COSTS); acts=structuredClone(DEFAULT_ACTS);
+  await save(); renderAll(); toast('Reset done');
+});
+
+load();
+</script>
+</body>
+</html>
